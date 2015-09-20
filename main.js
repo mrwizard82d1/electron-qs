@@ -25,7 +25,8 @@ app.on('ready', function() {
   // Load the index page for the app.
   mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
-  // Open the development tools. (What is the result of this call?)
+  // Open the development tools. 
+  mainWindow.openDevTools();
 
   // When main window closed
   mainWindow.on('closed', function() {
