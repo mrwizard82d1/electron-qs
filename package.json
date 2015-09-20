@@ -1,5 +1,5 @@
 {
   "name": "electron-quick-start",
   "version": "0.1.0",
-  "main": "main.js"
+  "main": "out/electron_qs.js"
 }

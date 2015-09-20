@@ -1,6 +1,7 @@
-(require '[cljs.build.api :as b])
+(require '[cljs.build.api])
 
-(b/watch "src"
-  {:main 'electron-qs.core
-   :output-to "out/electron_qs.js"
-   :output-dir "out"})
+(cljs.build.api/watch "src"
+                      {:main 'electron-qs.core
+                       :output-to "out/electron_qs.js"
+                       :output-dir "out"
+                       :target :nodejs})
