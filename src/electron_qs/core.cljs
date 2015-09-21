@@ -5,35 +5,42 @@
 
 (def process (js/require "process"))
 
-;; The module controlling the application life cycle.
-(def app (js/require "app"))
-
-;; A browser window (class).
-(def BrowserWindow (js/require "browser-window"))
-
-;; Report crashes.
-(.start (js/require "crash-reporter"))
-
-;; Retain a reference to the main window so JavaScript does not destroy the instance.
-(def main-window (atom nil))
-
-;; Quit when the user closes all windows.
-(.on app "window-all-closed"
-     ;; On OS X, it is common for applications and their menu bar to remain active until the user explicitly closes
-     ;; the application using Cmd-Q.
-     (fn []
-       (when-not (= "darwin" (.platform process))
-         (.quit app))))
+(defn quit-if-not-mac-osx [app]
+  "On OS X, it is common for applications and their menu bar to remain active until the user explicitly closes the application
+using Cmd-Q."
+  (when-not (= "darwin" (.platform process))
+         (.quit app)))
 
 ;; When the electron has finished initialization
-(defn do-when-ready []
-  ;; Create the browser window.
+(defn do-when-ready [main-window]
+  (let [BrowserWindow (js/require "browser-window")]
+    (println (str "In do-when-ready/1: "  (if @main-window @main-window "nil")))
+    ;; Create the browser window.
+    (println "BrowserWindow before " BrowserWindow)
     (swap! main-window BrowserWindow. (clj->js {:width 800 :height 600}))
-  )
-(.on app "ready" do-when-ready)
+    (println "main-window " main-window)
+    (println (str "file://" js/__dirname "index.html"))
+    (.loadUrl main-window (str "file://" js/__dirname "index.html"))
+    ;; (.on main-window "closed"
+    ;;      (fn []
+    ;;        ;; Deference the window object. If your app supports multiple windows, you would typically store them in an array.
+    ;;        ;; In this situation, you would delete the corresponding element of the array.
+    ;;        (swap! main-window identity nil)))
+))
 
 (defn -main [& args]
-  (println "Hello, Electron World!"))
+  (let [ ;; require the node project module
+        app (js/require "app") ;; define the application
+        main-window (atom nil)]
+    (.start (js/require "crash-reporter"))
+    (println "Before setting 'window-all-closed.'")
+    ;; (.on app "window-all-closed" (partial quit-if-not-mac-osx app))
+    (println "before setting 'ready'")
+    (.on app "ready" (partial do-when-ready main-window))
+
+    
+    (println "Hello, Electron World!"))
+  )
 
 (set! *main-cli-fn* -main)
 
